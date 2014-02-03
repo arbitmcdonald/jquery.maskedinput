@@ -12,7 +12,7 @@ var pasteEventName = getPasteEvent() + ".mask",
 	iPhone = /iphone/i.test(ua),
 	chrome = /chrome/i.test(ua),
 	android=/android/i.test(ua),
-	caretTimeoutId;
+	maskedcaretTimeoutId;
 
 $.mask = {
 	//Predefined character definitions
@@ -28,7 +28,7 @@ $.mask = {
 
 $.fn.extend({
 	//Helper Function for Caret positioning
-	caret: function(begin, end) {
+	maskedcaret: function(begin, end) {
 		var range;
 
 		if (this.length === 0 || this.is(":hidden")) {
@@ -144,7 +144,7 @@ $.fn.extend({
 					}
 				}
 				writeBuffer();
-				input.caret(Math.max(firstNonMaskPos, begin));
+				input.maskedcaret(Math.max(firstNonMaskPos, begin));
 			}
 
 			function shiftR(pos) {
@@ -182,7 +182,7 @@ $.fn.extend({
 
 				//backspace, delete, and escape get special treatment
 				if (k === 8 || k === 46 || (iPhone && k === 127)) {
-					pos = input.caret();
+					pos = input.maskedcaret();
 					begin = pos.begin;
 					end = pos.end;
 
@@ -198,14 +198,14 @@ $.fn.extend({
 					blurEvent.call(this, e);
 				} else if (k === 27) { // escape
 					input.val(focusText);
-					input.caret(0, checkVal());
+					input.maskedcaret(0, checkVal());
 					e.preventDefault();
 				}
 			}
 
 			function keypressEvent(e) {
 				var k = e.which,
-					pos = input.caret(),
+					pos = input.maskedcaret(),
 					p,
 					c,
 					next;
@@ -246,9 +246,9 @@ $.fn.extend({
 							next = seekNext(p);
 
 							if(android){
-								setTimeout($.proxy($.fn.caret,input,next),0);
+								setTimeout($.proxy($.fn.maskedcaret,input,next),0);
 							}else{
-								input.caret(next);
+								input.maskedcaret(next);
 							}
 
 							if (settings.completed && next >= len) {
@@ -332,19 +332,19 @@ $.fn.extend({
 						.removeData($.mask.dataName);
 				})
 				.bind("focus.mask", function() {
-					clearTimeout(caretTimeoutId);
+					clearTimeout(maskedcaretTimeoutId);
 					var pos;
 
 					focusText = input.val();
 
 					pos = checkVal();
 
-					caretTimeoutId = setTimeout(function(){
+					maskedcaretTimeoutId = setTimeout(function(){
 						writeBuffer();
 						if (pos == mask.replace("?","").length) {
-							input.caret(0, pos);
+							input.maskedcaret(0, pos);
 						} else {
-							input.caret(pos);
+							input.maskedcaret(pos);
 						}
 					}, 10);
 				})
@@ -354,7 +354,7 @@ $.fn.extend({
 				.bind(pasteEventName, function() {
 					setTimeout(function() {
 						var pos=checkVal(true);
-						input.caret(pos);
+						input.maskedcaret(pos);
 						if (settings.completed && pos == input.val().length)
 							settings.completed.call(input);
 					}, 0);
